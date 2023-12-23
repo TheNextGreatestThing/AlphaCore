@@ -21,7 +21,7 @@ int main(int argc, const char * argv[]) {
     std::cout << "Hello, World!\n";
     
     //Instantiate a neural network as an object. The first parameter is an array describing the layers of the neural network. The second parameter describes the initialization of weights.
-    AlphaCore::CPUFeedForwardNeuralNetwork XOR({2, 5, 4, 2}, AlphaCore::Arguments::GLOROT_INIT);
+    AlphaCore::CPUFeedForwardNeuralNetwork XOR({2, 5, 2, 2}, AlphaCore::Arguments::GLOROT_INIT);
     //...to load a saved neural network from a file, simply pass in the file location as a std::string as the constructor parameter. Saving a network to a file will be demonstrated at the end.
     
     //Set activations by first passing a number corresponding to the layer, and then a function from the AlphaCore library corresponding to the activation function. Layer numbers for this function start at 0, with zero indicating the first hidden layer. Custom activation functions can be set by passing in a lambda or function pointer to a custom function. The same goes for the derivative fucntions of each layer. Note that, by default, all activation functions are Sigmoid and all derivative functions are the derivatives of sigmoid.
