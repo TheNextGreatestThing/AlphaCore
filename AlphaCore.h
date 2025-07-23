@@ -39,19 +39,19 @@ int createDirectory(const char *path) {
     struct stat st;
 
     if (stat(path, &st) == 0) {
-        // The directory already exists.
+    
         if (S_ISDIR(st.st_mode)) {
-            return 0; // Directory exists, no need to create.
+            return 0; 
         } else {
-            // A file with the same name exists, which prevents directory creation.
+            
             return -1;
         }
     } else {
-        // The directory doesn't exist, so create it.
+        
         if (mkdir(path, 0777) == 0) {
-            return 0; // Directory created successfully.
+            return 0; 
         } else {
-            return -1; // Error in directory creation.
+            return -1; 
         }
     }
 }
@@ -78,12 +78,12 @@ void readCUDAMatrixFromFile(float* d_matrix, const char* filename, int numRows, 
         }
     }
 
-    // Copy data from host to GPU
+
     cudaCheckError(cudaMemcpy(d_matrix, h_matrix.data(), numRows * numCols * sizeof(float), cudaMemcpyHostToDevice));
 
 }
 
-// Function to write a CUDA matrix to a file
+
 void writeCUDAMatrixToFile(float* d_matrix, const char* filename, int numRows, int numCols) {
          std::vector<float> h_matrix(numRows * numCols);
     
@@ -233,39 +233,39 @@ public:
     int cols;
 
 public:
-    // Constructor
+   
     CudaMatrix(int rows, int cols) : rows(rows), cols(cols) {
         cudaMallocManaged(&data, rows * cols * sizeof(float));
     }
 
-    //Copy constructor
+  
     CudaMatrix(const CudaMatrix& other) : rows(other.rows), cols(other.cols) {
         this->rows = other.rows;
        this->cols = other.cols;
       cudaMallocManaged(&data, rows * cols * sizeof(float));
 
-        // Copy the data from the other matrix
+      
         for (int i = 0; i < rows * cols; ++i) {
             data[i] = other.data[i];
         }
     }
 
-    //Move constructor
+
      CudaMatrix(CudaMatrix&& other) noexcept : data(other.data), rows(other.rows), cols(other.cols) {
-        // Set the source object to a valid but unspecified state
+        
         other.data = nullptr;
         other.rows = 0;
         other.cols = 0;
     }
 
-    //Default constructor
+
     CudaMatrix() {
       data = nullptr;
       rows = GPUMATRIX_NO_INIT;
       cols = GPUMATRIX_NO_INIT;
     };
 
-    // Destructor
+
     ~CudaMatrix() {
         cudaFree(data);
     }
@@ -283,13 +283,13 @@ public:
        this->cols = other.cols;
       cudaMallocManaged(&data, rows * cols * sizeof(float));
 
-        // Copy the data from the other matrix
+     
         for (int i = 0; i < rows * cols; ++i) {
             data[i] = other.data[i];
         }
     };
 
-    // Matrix-Matrix Multiplication
+
     CudaMatrix matrixProd(const CudaMatrix& other) const {
         if (cols != other.rows) {
             std::cerr << "Error: Matrix dimensions mismatch for multiplication.\n";
@@ -308,14 +308,14 @@ public:
         return result;
     }
 
-    // Matrix-Float Multiplication
+    
     CudaMatrix operator*(float scalar) const {
         CudaMatrix result(rows, cols);
 
         dim3 blockSize(16, 16);
         dim3 gridSize((cols + blockSize.x - 1) / blockSize.x, (rows + blockSize.y - 1) / blockSize.y);
 
-        // Perform matrix-float multiplication on the GPU
+        
         multiplyScalarKernel<<<gridSize, blockSize>>>(data, rows, cols, scalar, result.data);
         cudaDeviceSynchronize();
 
@@ -327,19 +327,19 @@ public:
         dim3 blockSize(16, 16);
         dim3 gridSize((cols + blockSize.x - 1) / blockSize.x, (rows + blockSize.y - 1) / blockSize.y);
 
-        // Perform matrix-float multiplication on the GPU
+       
         multiplyScalarKernel<<<gridSize, blockSize>>>(data, rows, cols, scalar, data);
         cudaDeviceSynchronize();
     }
 
-    // Matrix-Float Addition
+   
     CudaMatrix operator+(float scalar) const {
         CudaMatrix result(rows, cols);
 
         dim3 blockSize(16, 16);
         dim3 gridSize((cols + blockSize.x - 1) / blockSize.x, (rows + blockSize.y - 1) / blockSize.y);
 
-        // Perform matrix-float addition on the GPU
+  
         addScalarKernel<<<gridSize, blockSize>>>(data, rows, cols, scalar, result.data);
         cudaDeviceSynchronize();
 
@@ -351,12 +351,12 @@ public:
         dim3 blockSize(16, 16);
         dim3 gridSize((cols + blockSize.x - 1) / blockSize.x, (rows + blockSize.y - 1) / blockSize.y);
 
-        // Perform matrix-float addition on the GPU
+
         addScalarKernel<<<gridSize, blockSize>>>(data, rows, cols, scalar, data);
         cudaDeviceSynchronize();
     }
 
-    // Element-wise Matrix-Matrix Multiplication
+
     CudaMatrix elementProd(const CudaMatrix& other) const {
         if (rows != other.rows || cols != other.cols) {
             std::cerr << "Error: Element-wise matrix dimensions mismatch for multiplication.\n";
@@ -368,7 +368,7 @@ public:
         dim3 blockSize(16, 16);
         dim3 gridSize((cols + blockSize.x - 1) / blockSize.x, (rows + blockSize.y - 1) / blockSize.y);
 
-        // Perform element-wise matrix multiplication on the GPU
+     
         elementWiseMultiplyKernel<<<gridSize, blockSize>>>(data, other.data, rows, cols, result.data);
         cudaDeviceSynchronize();
 
@@ -382,7 +382,7 @@ elementWiseAddKernel<<<gridSize, blockSize>>>(data, m.data, rows, cols, data);
         cudaDeviceSynchronize();
     }
 
-    // Element-wise Matrix-Matrix Addition
+
     CudaMatrix operator+(const CudaMatrix& other) const {
         if (rows != other.rows || cols != other.cols) {
             std::cerr << "Error: Element-wise matrix dimensions mismatch for addition.\n";
@@ -394,7 +394,7 @@ elementWiseAddKernel<<<gridSize, blockSize>>>(data, m.data, rows, cols, data);
         dim3 blockSize(16, 16);
         dim3 gridSize((cols + blockSize.x - 1) / blockSize.x, (rows + blockSize.y - 1) / blockSize.y);
 
-        // Perform element-wise matrix addition on the GPU
+
         elementWiseAddKernel<<<gridSize, blockSize>>>(data, other.data, rows, cols, result.data);
         cudaDeviceSynchronize();
 
@@ -421,11 +421,11 @@ elementWiseAddKernel<<<gridSize, blockSize>>>(data, m.data, rows, cols, data);
         dim3 blockSize(16, 16);
         dim3 gridSize((cols + blockSize.x - 1) / blockSize.x, (rows + blockSize.y - 1) / blockSize.y);
 
-        // Perform matrix transposition on the GPU
+
         transposeKernel<<<gridSize, blockSize>>>(data, rows, cols, result.data);
         cudaDeviceSynchronize();
 
-        // Swap dimensions and data with the result matrix
+
         std::swap(rows, result.rows);
         std::swap(cols, result.cols);
         std::swap(data, result.data);
