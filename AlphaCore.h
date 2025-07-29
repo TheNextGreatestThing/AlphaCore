@@ -596,8 +596,8 @@ public:
     }
     
     static GPUMatrix multiply(GPUMatrix&& a, GPUMatrix&& b) {
-        assert(a.rows = b.rows);
-        assert(a.cols = b.cols);
+        assert(a.rows == b.rows);
+        assert(a.cols == b.cols);
         GPUMatrix result(a.rows, a.cols);
         result.data = a.data.elementProd(b.data);
         return result;
